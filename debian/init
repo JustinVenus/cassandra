@@ -20,7 +20,7 @@ PIDFILE=/var/run/$NAME/$NAME.pid
 SCRIPTNAME=/etc/init.d/$NAME
 CONFDIR=/etc/cassandra
 WAIT_FOR_START=10
-CASSANDRA_HOME=/usr/share/cassandra
+CASSANDRA_HOME=`getent passwd cassandra | awk -F ':' '{ print $6; }'`
 CASSANDRA_CONF=$CONFDIR
 FD_LIMIT=100000
 
@@ -72,9 +72,8 @@ do_start()
     ulimit -l unlimited
     ulimit -n "$FD_LIMIT"
 
-    cassandra_home=`getent passwd cassandra | awk -F ':' '{ print $6; }'`
-    heap_dump_f="$cassandra_home/java_`date +%s`.hprof"
-    error_log_f="$cassandra_home/hs_err_`date +%s`.log"
+    heap_dump_f="$CASSANDRA_HOME/java_`date +%s`.hprof"
+    error_log_f="$CASSANDRA_HOME/hs_err_`date +%s`.log"
 
     [ -e `dirname "$PIDFILE"` ] || \
         install -d -ocassandra -gcassandra -m755 `dirname $PIDFILE`
